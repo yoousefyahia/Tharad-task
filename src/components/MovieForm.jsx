@@ -1,137 +1,156 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useMovieStore } from "../store/movieStore";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { AiOutlineCheck } from "react-icons/ai"; 
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import "./MovieForm.css";
+
+const movieSchema = z.object({
+  name: z.string().min(1, { message: "Movie name is required" }),
+  description: z.string().min(1, { message: "Description is required" }),
+  image: z.string().url({ message: "Must be a valid URL" }).or(z.literal('')),
+  genres: z.array(z.string()).min(1, { message: "Select at least one genre" }),
+  rating: z.number().optional(),
+  inTheaters: z.boolean(),
+});
 
 export default function MovieForm() {
   const { movies, editing, setEditing, save } = useMovieStore();
-  const [form, setForm] = useState({ name: "", image: "", rating: 0, genres: [], description: "", inTheaters: false });
 
-  const allGenres = Array.from(new Set(movies.flatMap(m => m.genres || []))).sort();
+  const allGenres = Array.from(
+    new Set(movies.flatMap(m => m.genres || []))
+  ).sort();
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(movieSchema),
+    defaultValues: {
+      name: "",
+      image: "",
+      rating: 0,
+      genres: [],
+      description: "",
+      inTheaters: false,
+    },
+  });
 
   useEffect(() => {
     if (editing) {
-      setForm({
-        ...editing,
-        genres: editing.genres || []
-      });
+      reset(editing);
     } else {
-      setForm({ name: "", image: "", rating: 0, genres: [], description: "", inTheaters: false });
+      reset({
+        name: "",
+        image: "",
+        rating: 0,
+        genres: [],
+        description: "",
+        inTheaters: false,
+      });
     }
-  }, [editing]);
+  }, [editing, reset]);
 
   if (!editing) return null;
 
-  const toggleGenre = (g) => {
-    setForm(prev => ({
-      ...prev,
-      genres: prev.genres.includes(g)
-        ? prev.genres.filter(x => x !== g)
-        : [...prev.genres, g]
-    }));
-  };
-
-  const handleSubmit = () => {
+  const onSubmit = (data) => {
     save({
       ...editing,
-      ...form,
-      rating: Number(form.rating)
+      ...data,
+      rating: Number(data.rating),
     });
   };
 
   return (
     <Dialog open={!!editing} onOpenChange={(open) => !open && setEditing(null)}>
       <DialogContent>
-        <DialogTitle style={{ color: 'white', marginBottom: '0.5rem', fontSize: '1.25rem' }}>
+        <DialogTitle>
           {editing.id ? "Edit Movie" : "Add Movie"}
         </DialogTitle>
-        
-        <div className="movie-form-content">
-          
+
+        <form onSubmit={handleSubmit(onSubmit)} className="movie-form-content">
+
+          {/* Name */}
           <div className="form-group">
             <label className="form-label">Name</label>
-            <input 
-              value={form.name} 
-              onChange={e => setForm({...form, name: e.target.value})} 
-              className="form-input"
-              placeholder="Movie Name"
-            />
+            <input className="form-input" {...register("name")} />
+            {errors.name && (
+              <span className="form-error">{errors.name.message}</span>
+            )}
           </div>
-          
+
+          {/* Description */}
           <div className="form-group">
             <label className="form-label">Description</label>
-            <textarea 
+            <textarea
               className="form-input form-textarea"
-              value={form.description} 
-              onChange={e => setForm({...form, description: e.target.value})}
-              placeholder="Movie description..." 
-              rows={3}
+              {...register("description")}
             />
+            {errors.description && (
+              <span className="form-error">{errors.description.message}</span>
+            )}
           </div>
 
+          {/* Image */}
           <div className="form-group">
             <label className="form-label">Image URL</label>
-            <input 
-              value={form.image} 
-              onChange={e => setForm({...form, image: e.target.value})} 
-              className="form-input"
-              placeholder="https://..."
-            />
+            <input className="form-input" {...register("image")} />
+            {errors.image && (
+              <span className="form-error">{errors.image.message}</span>
+            )}
+          </div>
+
+          {/* Genres */}
+          <div className="form-group">
+            <label className="form-label">Genres</label>
+
+            <div className="genres-container">
+              {allGenres.map((g) => (
+                <label key={g}>
+                  <input
+                    type="checkbox"
+                    value={g}
+                    {...register("genres")}
+                  />
+                  {g}
+                </label>
+              ))}
+            </div>
+
+            {errors.genres && (
+              <span className="form-error">{errors.genres.message}</span>
+            )}
           </div>
 
           <div className="form-group">
-            <label className="form-label">Genres</label>
-            <div className="genres-container custom-scrollbar">
-              {allGenres.map(g => {
-                const isSelected = form.genres.includes(g);
-                return (
-                  <div 
-                    key={g} 
-                    onClick={() => toggleGenre(g)}
-                    className={`genre-item ${isSelected ? 'selected' : 'unselected'}`}
-                  >
-                    <span>{g}</span>
-                    {isSelected && (
-                      <span className="check-icon">
-                        <AiOutlineCheck size={14} color="black" /> 
-                      </span>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          <div 
-            className="theater-group" 
-            onClick={() => setForm({...form, inTheaters: !form.inTheaters})}
-          >
-            <div className={`theater-toggle ${form.inTheaters ? 'active' : ''}`}>
-              {form.inTheaters && <AiOutlineCheck size={14} color="white" />}
-            </div>
-            <span className="theater-text">
+            <label className="theater-label">
+              <input
+                type="checkbox"
+                {...register("inTheaters")}
+              />
               In theaters
-            </span>
+            </label>
           </div>
 
           <div className="form-actions">
-             <Button 
-               variant="ghost" 
-               onClick={() => setEditing(null)}
-               className="btn-cancel px-6"
-             >
-               Cancel
-             </Button>
-             <Button 
-               onClick={handleSubmit}
-               className="btn-submit px-8 py-2 rounded-md font-medium"
-             >
-               {editing.id ? "Update" : "Create"}
-             </Button>
+            <Button
+              type="button"
+              className="btn-cancel"
+              onClick={() => setEditing(null)}
+            >
+              Cancel
+            </Button>
+
+            <Button type="submit" className="btn-submit">
+              {editing.id ? "Update" : "Create"}
+            </Button>
           </div>
-        </div>
+
+        </form>
       </DialogContent>
     </Dialog>
   );
