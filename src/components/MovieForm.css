@@ -1,0 +1,165 @@
+.movie-form-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    color: white;
+    padding-top: 0.5rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.form-label {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: #e5e7eb;
+}
+
+.form-input {
+    background-color: #0F1115;
+    border: 1px solid #374151;
+    color: white;
+    padding: 0.5rem;
+    border-radius: 0;
+    outline: none;
+    font-size: 0.825rem;
+    width: 100%;
+    transition: border-color 0.2s;
+}
+
+.form-input:focus {
+    border-color: #3b82f6;
+    /* blue-500 */
+    box-shadow: 0 0 0 1px #3b82f6;
+}
+
+.form-textarea {
+    resize: vertical;
+    min-height: 60px;
+}
+
+/* Genres Styling */
+.genres-container {
+    background-color: #0F1115;
+    border: 1px solid #374151;
+    border-radius: 0;
+    padding: 0.25rem;
+    max-height: 10rem;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+}
+
+.genre-item {
+    padding: 0.35rem 0.5rem;
+    cursor: pointer;
+    border-radius: 0;
+    font-size: 0.825rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: all 0.2s;
+    user-select: none;
+}
+
+/* Unselected State */
+.genre-item.unselected {
+    color: #d1d5db;
+    /* gray-300 */
+    background-color: transparent;
+}
+
+.genre-item.unselected:hover {
+    background-color: #1f2937;
+    /* gray-800 */
+}
+
+/* Selected State - White BG, Black Text */
+.genre-item.selected {
+    background-color: white;
+    color: black;
+    font-weight: 600;
+    box-shadow: none;
+}
+
+.check-icon {
+    font-weight: bold;
+    font-size: 0.8rem;
+}
+
+/* In Theaters Toggle - Matching FiltersBar Style */
+.theater-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    user-select: none;
+    margin-top: 0.25rem;
+    width: fit-content;
+}
+
+.theater-toggle {
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+    border: 1px solid #6b7280;
+    /* gray-500 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.theater-toggle.active {
+    border-color: white;
+    background-color: #4b5563;
+}
+
+.theater-dot {
+    width: 10px;
+    height: 10px;
+    background-color: white;
+    border-radius: 2px;
+}
+
+.theater-text {
+    font-size: 0.875rem;
+    color: #e5e7eb;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid #1f2937;
+}
+
+.btn-cancel {
+    background-color: #333;
+    color: white;
+    border: 1px solid #4b5563;
+    border-radius: 0 !important;
+    font-size: 0.825rem;
+}
+
+.btn-cancel:hover {
+    background-color: #444;
+}
+
+.btn-submit {
+    background-color: #0ea5e9;
+    color: white;
+    border: none;
+    box-shadow: none;
+    border-radius: 0 !important;
+    font-size: 0.825rem;
+}
+
+.btn-submit:hover {
+    background-color: #0284c7;
+}
